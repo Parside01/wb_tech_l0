@@ -29,7 +29,7 @@ func main() {
 	})
 
 	router.GET("/", func(c echo.Context) error {
-		all, err := repo.GetAllOrders(c.Request().Context())
+		all, err := repo.GetAll(c.Request().Context())
 		if err != nil {
 			fmt.Println(err)
 			return err
