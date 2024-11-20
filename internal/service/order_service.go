@@ -35,5 +35,5 @@ func (s *orderService) SaveOrder(ctx context.Context, order *entity.Order) error
 		i.OrderID = order.OrderUID
 	}
 
-	return s.repo.SaveOrder(ctx, order)
+	return s.repo.Save(ctx, order)
 }
