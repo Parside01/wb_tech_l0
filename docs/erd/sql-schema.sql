@@ -14,10 +14,10 @@ CREATE TABLE IF NOT EXISTS orders
     date_created TIMESTAMP,
     oof_shard TEXT NOT NULL,
 
-    CONSTRAINT delivery_id_fk FOREIGN KEY (delivery_id) REFERENCES delivery (delivery_id)
+    CONSTRAINT delivery_id_fk FOREIGN KEY (delivery_id) REFERENCES Delivery (delivery_id)
 );
 
-CREATE TABLE IF NOT EXISTS delivery
+CREATE TABLE IF NOT EXISTS Delivery
 (
     delivery_id TEXT NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
