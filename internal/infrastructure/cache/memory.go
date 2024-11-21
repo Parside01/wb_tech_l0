@@ -1,37 +1,75 @@
 package cache
 
 import (
+	"container/list"
 	"sync"
-	"wb_tech_l0/internal/entity"
 )
 
-type memoryCache struct {
-	mutex  sync.RWMutex
-	memory map[string]*entity.Order
+type lruCacheItem struct {
+	cacheable Cacheable
+	element   *list.Element
 }
 
-func NewMemoryCache() Cache {
-	return &memoryCache{
-		memory: make(map[string]*entity.Order),
-		mutex:  sync.RWMutex{},
+type lruMemoryCache struct {
+	mutex    sync.RWMutex
+	memory   map[string]*lruCacheItem
+	capacity int
+	list     *list.List
+}
+
+func NewMemoryCache(capacity int) Cache {
+	return &lruMemoryCache{
+		memory:   make(map[string]*lruCacheItem, capacity),
+		mutex:    sync.RWMutex{},
+		list:     list.New(),
+		capacity: capacity,
 	}
 }
 
-func (c *memoryCache) Set(key string, order *entity.Order) {
+func (c *lruMemoryCache) Set(key string, value Cacheable) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	c.memory[key] = order
+
+	if e, ok := c.memory[key]; ok {
+		c.list.MoveToFront(e.element)
+		e.cacheable = value
+		return
+	}
+
+	if c.list.Len() == c.capacity {
+		back := c.list.Back()
+		if back != nil {
+			c.list.Remove(back)
+			delete(c.memory, back.Value.(*lruCacheItem).cacheable.Key())
+		}
+	}
+
+	newItem := &lruCacheItem{cacheable: value}
+	newElem := c.list.PushFront(newItem)
+	newItem.element = newElem
+
+	c.memory[key] = newItem
 }
 
-func (c *memoryCache) Get(key string) (*entity.Order, bool) {
+func (c *lruMemoryCache) Get(key string) (Cacheable, bool) {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
-	order, ok := c.memory[key]
-	return order, ok
+
+	item, ok := c.memory[key]
+	if !ok {
+		return nil, false
+	}
+
+	c.list.MoveToFront(item.element)
+	return item.cacheable, true
 }
 
-func (c *memoryCache) Delete(key string) {
+func (c *lruMemoryCache) Delete(key string) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	delete(c.memory, key)
+
+	if item, ok := c.memory[key]; ok {
+		c.list.Remove(item.element)
+		delete(c.memory, key)
+	}
 }

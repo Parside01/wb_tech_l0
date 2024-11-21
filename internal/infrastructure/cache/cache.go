@@ -1,11 +1,12 @@
 package cache
 
-import (
-	"wb_tech_l0/internal/entity"
-)
+type Cacheable interface {
+	Key() string
+	Size() int
+}
 
 type Cache interface {
-	Set(key string, order *entity.Order)
-	Get(key string) (*entity.Order, bool)
+	Set(key string, value Cacheable)
+	Get(key string) (Cacheable, bool)
 	Delete(key string)
 }
