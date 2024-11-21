@@ -3,6 +3,7 @@ package database
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	sqlxmock "github.com/zhashkevych/go-sqlxmock"
 	"os"
 )
 
@@ -16,4 +17,9 @@ func NewPostgresDB() (*sqlx.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func NewPostgresDBMock() (*sqlx.DB, error) {
+	db, mock, err := sqlxmock.New()
+	mock
 }

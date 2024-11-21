@@ -16,9 +16,9 @@ func (t *TestCacheData) Key() string {
 }
 
 func TestLruMemoryCache(t *testing.T) {
-	TestSetGetFromLruMemoryCache(t)
-	TestDeleteFromLruMemoryCache(t)
-	TestExceedingCapacityLruMemoryCache(t)
+	t.Run("Test Set-Get from lru memory cache", TestSetGetFromLruMemoryCache)
+	t.Run("Test Delete from lru memory cache", TestDeleteFromLruMemoryCache)
+	t.Run("Test exceeding capacity in lru memory cache", TestExceedingCapacityLruMemoryCache)
 }
 
 func TestSetGetFromLruMemoryCache(t *testing.T) {

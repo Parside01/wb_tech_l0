@@ -22,6 +22,7 @@ type orderService struct {
 	cache cache.Cache
 }
 
+// TODO: Надо бы наверное тесты написать..
 func NewOrderService(repo repository.OrderRepository, cache cache.Cache) OrderService {
 	return &orderService{
 		repo:  repo,

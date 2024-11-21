@@ -26,19 +26,13 @@ func NewKafkaConsumer(brokers []string, topic string) *KafkaConsumer {
 	}
 }
 
-func (c *KafkaConsumer) Consume(ctx context.Context, handler func(message kafka.Message) error) error {
-	for {
-		select {
-		case <-ctx.Done():
-			return ctx.Err()
-		default:
-			message, err := c.reader.ReadMessage(ctx)
-			if err != nil {
-				return fmt.Errorf("Error reading message from Kafka: %s", err)
-			}
-			if err := handler(message); err != nil {
-				return fmt.Errorf("Error processing message from Kafka: %s", err)
-			}
-		}
+func (c *KafkaConsumer) Consume(ctx context.Context, handler func(ctx context.Context, message kafka.Message) error) error {
+	message, err := c.reader.ReadMessage(ctx)
+	if err != nil {
+		return fmt.Errorf("Error reading message from Kafka: %s", err)
 	}
+	if err := handler(ctx, message); err != nil {
+		return fmt.Errorf("Error processing message from Kafka: %s", err)
+	}
+	return nil
 }
