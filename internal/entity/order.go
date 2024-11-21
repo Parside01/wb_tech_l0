@@ -73,6 +73,7 @@ func UnmarshalOrder(data []byte) (Order, error) {
 	return order, err
 }
 
+// TODO: Может просто стоит добавить id-шники в delivery и payments, чтобы это все ненужное.
 type SQLOrder struct {
 	OrderUID          string `json:"order_uid" db:"order_uid"`
 	TrackNumber       string `json:"track_number" db:"track_number"`
