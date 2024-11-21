@@ -12,6 +12,8 @@ type KafkaConsumer struct {
 	reader  *kafka.Reader
 }
 
+// TODO: Если сейчас что-то упадет в процессе, то все поломается и потеряется.
+// Надо подумать чего с этим сделать.
 func NewKafkaConsumer(brokers []string, topic string) *KafkaConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:        brokers,
