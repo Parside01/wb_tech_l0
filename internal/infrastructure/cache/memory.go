@@ -73,3 +73,10 @@ func (c *lruMemoryCache) Delete(key string) {
 		delete(c.memory, key)
 	}
 }
+
+func (c *lruMemoryCache) Clear() {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	c.memory = make(map[string]*lruCacheItem, c.capacity)
+}

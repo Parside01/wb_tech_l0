@@ -19,6 +19,10 @@ type Order struct {
 	OofShard          string    `json:"oof_shard" db:"oof_shard"`
 }
 
+func (o *Order) Key() string {
+	return o.OrderUID
+}
+
 type Delivery struct {
 	DeliveryID string `json:"delivery_id" db:"delivery_id"`
 	Name       string `json:"name" db:"name"`
