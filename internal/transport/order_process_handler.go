@@ -1,10 +1,11 @@
-package kafka
+package transport
 
 import (
 	"context"
 	"encoding/json"
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
+	"time"
 	"wb_tech_l0/internal/entity"
 	"wb_tech_l0/internal/infrastructure/broker"
 	"wb_tech_l0/internal/service"
@@ -26,24 +27,38 @@ func NewOrderProcessHandler(service service.OrderService, consumer *broker.Kafka
 
 func (h *OrderProcessHandler) Start(ctx context.Context) error {
 	for {
-		if err := h.consumer.ConsumeMessage(ctx, h.handleMessage); err != nil {
+		if err := h.consumer.ConsumeMessage(ctx, h.loggingMiddleware(h.handleMessage)); err != nil {
 			return err
 		}
 	}
 }
 
 func (h *OrderProcessHandler) handleMessage(ctx context.Context, message kafka.Message) error {
-	h.logger.Info("Received message from kafka", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
-
 	var order *entity.Order
 	if err := json.Unmarshal(message.Value, &order); err != nil {
-		h.logger.Error("Failed to unmarshal", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
 		return err
 	}
 	if err := h.service.SaveOrder(ctx, order); err != nil {
-		h.logger.Error("Failed to save order", zap.Error(err))
+		return err
 	}
 
-	h.logger.Info("Order saved successful", zap.String("key", string(message.Key)))
 	return nil
+}
+
+func (h *OrderProcessHandler) loggingMiddleware(next broker.KafkaMessageHandler) broker.KafkaMessageHandler {
+	return func(ctx context.Context, message kafka.Message) error {
+		start := time.Now()
+		h.logger.Info("Received message from kafka", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
+
+		err := next(ctx, message)
+
+		duration := time.Since(start)
+		if err != nil {
+			h.logger.Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
+		} else {
+			h.logger.Info("Message processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
+		}
+
+		return err
+	}
 }

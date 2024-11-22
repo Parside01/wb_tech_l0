@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"github.com/twharmon/gouid"
 	"wb_tech_l0/internal/entity"
 	"wb_tech_l0/internal/infrastructure/cache"
 	"wb_tech_l0/internal/repository"
@@ -33,11 +32,8 @@ func NewOrderService(repo repository.OrderRepository, cache cache.Cache) OrderSe
 // TODO: Не знаю на самом деле, кешировать это точно обязанность сервиса?
 // TODO: Нам нужно учитывать случай, когда пришел дубликат существуещего заказа?
 func (s *orderService) SaveOrder(ctx context.Context, order *entity.Order) error {
-	deliveryId := gouid.Bytes(IDsSize).String()
-	paymentId := gouid.Bytes(IDsSize).String()
-
-	order.Delivery.DeliveryID = deliveryId
-	order.Payment.PaymentID = paymentId
+	order.Delivery.OrderID = order.OrderUID
+	order.Payment.OrderID = order.OrderUID
 	for _, i := range order.Items {
 		i.OrderID = order.OrderUID
 	}

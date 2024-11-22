@@ -69,19 +69,19 @@ func (r *orderRepository) Save(ctx context.Context, order *entity.Order) error {
 }
 
 func (r *orderRepository) GetAll(ctx context.Context) (map[string]*entity.Order, error) {
-	sql_orders := []*entity.SQLOrder{}
-	if err := r.db.SelectContext(ctx, &sql_orders, getAllOrders); err != nil {
+	orders := []*entity.Order{}
+	if err := r.db.SelectContext(ctx, &orders, getAllOrders); err != nil {
 		return nil, err
 	}
 
-	orders := make(map[string]*entity.Order)
-	for _, o := range sql_orders {
-		delivery, err := r.delivery.GetByID(ctx, o.DeliveryID)
+	orders_map := make(map[string]*entity.Order)
+	for _, o := range orders {
+		delivery, err := r.delivery.GetByOrderID(ctx, o.OrderUID)
 		if err != nil {
 			return nil, err
 		}
 
-		payment, err := r.payments.GetByID(ctx, o.PaymentID)
+		payment, err := r.payments.GetByOrderID(ctx, o.OrderUID)
 		if err != nil {
 			return nil, err
 		}
@@ -92,14 +92,13 @@ func (r *orderRepository) GetAll(ctx context.Context) (map[string]*entity.Order,
 		}
 
 		order := &entity.Order{}
-		o.CopyToOrder(order)
 		order.Delivery = delivery
 		order.Payment = payment
 		order.Items = items
-		orders[o.OrderUID] = order
+		orders_map[o.OrderUID] = order
 	}
 
-	return orders, nil
+	return orders_map, nil
 }
 
 func (r *orderRepository) saveOrderTX(ctx context.Context, tx *sqlx.Tx, order *entity.Order) error {
@@ -107,8 +106,6 @@ func (r *orderRepository) saveOrderTX(ctx context.Context, tx *sqlx.Tx, order *e
 		order.OrderUID,
 		order.TrackNumber,
 		order.Entry,
-		order.Delivery.DeliveryID,
-		order.Payment.PaymentID,
 		order.Locate,
 		order.InternalSignature,
 		order.CustomerID,

@@ -8,7 +8,7 @@ import (
 
 type DeliveryRepository interface {
 	SaveTX(ctx context.Context, tx *sqlx.Tx, delivery *entity.Delivery) error
-	GetByID(ctx context.Context, id string) (*entity.Delivery, error)
+	GetByOrderID(ctx context.Context, id string) (*entity.Delivery, error)
 }
 
 type deliveryRepository struct {
@@ -23,7 +23,7 @@ func NewDeliveryRepository(db *sqlx.DB) DeliveryRepository {
 
 func (d *deliveryRepository) SaveTX(ctx context.Context, tx *sqlx.Tx, delivery *entity.Delivery) error {
 	if _, err := tx.ExecContext(ctx, saveDelivery,
-		delivery.DeliveryID,
+		delivery.OrderID,
 		delivery.Name,
 		delivery.Phone,
 		delivery.Zip,
@@ -37,9 +37,9 @@ func (d *deliveryRepository) SaveTX(ctx context.Context, tx *sqlx.Tx, delivery *
 	return nil
 }
 
-func (d *deliveryRepository) GetByID(ctx context.Context, id string) (*entity.Delivery, error) {
+func (d *deliveryRepository) GetByOrderID(ctx context.Context, id string) (*entity.Delivery, error) {
 	delivery := &entity.Delivery{}
-	if err := d.db.GetContext(ctx, delivery, getDeliveryByID, id); err != nil {
+	if err := d.db.GetContext(ctx, delivery, getDeliveryByOrderID, id); err != nil {
 		return nil, err
 	}
 	return delivery, nil

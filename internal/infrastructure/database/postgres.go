@@ -3,11 +3,9 @@ package database
 import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"os"
 )
 
-func NewPostgresDB() (*sqlx.DB, error) {
-	dsn := os.Getenv("POSTGRES_DSN")
+func NewPostgresDB(dsn string) (*sqlx.DB, error) {
 	if dsn == "" {
 		dsn = "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
 	}

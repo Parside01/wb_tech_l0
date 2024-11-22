@@ -24,18 +24,18 @@ func (o *Order) Key() string {
 }
 
 type Delivery struct {
-	DeliveryID string `json:"delivery_id" db:"delivery_id"`
-	Name       string `json:"name" db:"name"`
-	Phone      string `json:"phone" db:"phone"`
-	Zip        string `json:"zip" db:"zip"`
-	City       string `json:"city" db:"city"`
-	Address    string `json:"address" db:"address"`
-	Region     string `json:"region" db:"region"`
-	Email      string `json:"email" db:"email"`
+	OrderID string `db:"order_id"`
+	Name    string `json:"name" db:"name"`
+	Phone   string `json:"phone" db:"phone"`
+	Zip     string `json:"zip" db:"zip"`
+	City    string `json:"city" db:"city"`
+	Address string `json:"address" db:"address"`
+	Region  string `json:"region" db:"region"`
+	Email   string `json:"email" db:"email"`
 }
 
 type Payment struct {
-	PaymentID    string `json:"payment_id" db:"payment_id"`
+	OrderID      string `db:"order_id"`
 	Transaction  string `json:"transaction" db:"transaction"`
 	RequestID    string `json:"request_id" db:"request_id"`
 	Currency     string `json:"currency" db:"currency"`
@@ -49,7 +49,7 @@ type Payment struct {
 }
 
 type Item struct {
-	OrderID     string `json:"order_id" db:"order_id"`
+	OrderID     string `db:"order_id"`
 	ChrtID      int    `json:"chrt_id" db:"chrt_id"`
 	TrackNumber string `json:"track_number" db:"track_number"`
 	Price       int    `json:"price" db:"price"`
@@ -71,35 +71,4 @@ func UnmarshalOrder(data []byte) (Order, error) {
 	var order Order
 	err := json.Unmarshal(data, &order)
 	return order, err
-}
-
-// TODO: Может просто стоит добавить id-шники в delivery и payments, чтобы это все ненужное.
-type SQLOrder struct {
-	OrderUID          string `json:"order_uid" db:"order_uid"`
-	TrackNumber       string `json:"track_number" db:"track_number"`
-	Entry             string `json:"entry" db:"entry"`
-	DeliveryID        string `json:"delivery_id" db:"delivery_id"`
-	PaymentID         string `json:"payment_id" db:"payment_id"`
-	Locate            string `json:"locate" db:"locate"`
-	InternalSignature string `json:"internal_signature" db:"internal_signature"`
-	CustomerID        string `json:"customer_id" db:"customer_id"`
-	DeliveryService   string `json:"delivery_service" db:"delivery_service"`
-	ShardKey          string `json:"shard_key" db:"shard_key"`
-	SMID              int    `json:"sm_id" db:"sm_id"`
-	DateCreated       string `json:"date_created" db:"date_created"`
-	OofShard          string `json:"oof_shard" db:"oof_shard"`
-}
-
-func (s *SQLOrder) CopyToOrder(order *Order) {
-	order.OrderUID = s.OrderUID
-	order.TrackNumber = s.TrackNumber
-	order.Entry = s.Entry
-	order.SMID = s.SMID
-	order.DateCreated = s.DateCreated
-	order.OofShard = s.OofShard
-	order.Locate = s.Locate
-	order.InternalSignature = s.InternalSignature
-	order.CustomerID = s.CustomerID
-	order.ShardKey = s.ShardKey
-	order.DeliveryService = s.DeliveryService
 }

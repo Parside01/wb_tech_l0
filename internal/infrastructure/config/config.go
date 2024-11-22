@@ -5,17 +5,19 @@ import (
 )
 
 type Config struct {
-	HttpServerConfig    *HttpServerConfig    `yaml:"http_server" mapstructure:"http_server"`
-	LoggerConfig        *LoggerConfig        `yaml:"logger" mapstructure:"logger"`
-	PostgresConfig      *PostgresConfig      `yaml:"postgres" mapstructure:"postgres"`
-	KafkaConsumerConfig *KafkaConsumerConfig `yaml:"kafka_consumer" mapstructure:"kafka_consumer"`
-	MemoryCacheConfig   *MemoryCacheConfig   `yaml:"memory_cache" mapstructure:"memory_cache"`
+	HttpServerConfig  *HttpServerConfig  `yaml:"http_server" mapstructure:"http_server"`
+	LoggerConfig      *LoggerConfig      `yaml:"logger" mapstructure:"logger"`
+	PostgresConfig    *PostgresConfig    `yaml:"postgres" mapstructure:"postgres"`
+	KafkaConfig       *KafkaConfig       `yaml:"kafka" mapstructure:"kafka"`
+	MemoryCacheConfig *MemoryCacheConfig `yaml:"memory_cache" mapstructure:"memory_cache"`
 }
 
-type KafkaConsumerConfig struct {
-	Topic    string   `yaml:"topic" mapstructure:"topic"`
-	MaxBytes int      `yaml:"max_bytes" mapstructure:"max_bytes"`
-	Brokers  []string `yaml:"brokers" mapstructure:"brokers"`
+type KafkaConfig struct {
+	Topic             string   `yaml:"topic" mapstructure:"topic"`
+	NumPartitions     int      `yaml:"num_partitions" mapstructure:"num_partitions"`
+	ReplicationFactor int      `yaml:"replication_factor" mapstructure:"replication_factor"`
+	MaxBytes          int      `yaml:"max_bytes" mapstructure:"max_bytes"`
+	Brokers           []string `yaml:"brokers" mapstructure:"brokers"`
 }
 
 type LoggerConfig struct {
@@ -74,9 +76,11 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("postgres.dbname", "postgres")
 	v.SetDefault("postgres.sslmode", "disable")
 
-	v.SetDefault("kafka_consumer.topic", "orders")
-	v.SetDefault("kafka_consumer.max_bytes", 0)
-	v.SetDefault("kafka_consumer.brokers", []string{"localhost:9092"})
+	v.SetDefault("kafka.topic", "orders")
+	v.SetDefault("kafka.max_bytes", 0)
+	v.SetDefault("kafka.brokers", []string{"localhost:9092"})
+	v.SetDefault("kafka.num_partitions", 1)
+	v.SetDefault("kafka.replication_factor", 1)
 
 	v.SetDefault("memory_cache.capacity", 10000)
 }

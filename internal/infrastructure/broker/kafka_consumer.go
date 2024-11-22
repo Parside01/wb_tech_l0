@@ -4,25 +4,25 @@ import (
 	"context"
 	"fmt"
 	"github.com/segmentio/kafka-go"
+	"wb_tech_l0/internal/infrastructure/config"
 )
 
 type KafkaConsumer struct {
-	brokers []string
-	reader  *kafka.Reader
+	reader *kafka.Reader
 }
+
+type KafkaMessageHandler = func(ctx context.Context, msg kafka.Message) error
 
 // TODO: Если сейчас что-то упадет в процессе, то все поломается и потеряется.
 // Надо подумать чего с этим сделать.
-func NewKafkaConsumer(brokers []string, topic string) *KafkaConsumer {
+func NewKafkaConsumer() *KafkaConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  brokers,
-		Topic:    topic,
-		MaxBytes: 10e6,
+		Brokers:  config.Global.KafkaConfig.Brokers,
+		Topic:    config.Global.KafkaConfig.Topic,
+		MaxBytes: config.Global.KafkaConfig.MaxBytes,
 	})
-
 	return &KafkaConsumer{
-		brokers: brokers,
-		reader:  reader,
+		reader: reader,
 	}
 }
 
@@ -42,4 +42,8 @@ func (c *KafkaConsumer) ConsumeMessage(ctx context.Context, handler func(ctx con
 		return fmt.Errorf("Error committing message to Kafka: %s", err)
 	}
 	return nil
+}
+
+func (c *KafkaConsumer) Close() error {
+	return c.reader.Close()
 }

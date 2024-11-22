@@ -8,7 +8,7 @@ import (
 
 type PaymentRepository interface {
 	SaveTX(ctx context.Context, tx *sqlx.Tx, payment *entity.Payment) error
-	GetByID(ctx context.Context, id string) (*entity.Payment, error)
+	GetByOrderID(ctx context.Context, id string) (*entity.Payment, error)
 }
 
 type paymentRepository struct {
@@ -22,8 +22,8 @@ func NewPaymentRepository(db *sqlx.DB) PaymentRepository {
 }
 
 func (p *paymentRepository) SaveTX(ctx context.Context, tx *sqlx.Tx, payment *entity.Payment) error {
-	if _, err := tx.ExecContext(ctx, savePayments,
-		payment.PaymentID,
+	if _, err := tx.ExecContext(ctx, savePayment,
+		payment.OrderID,
 		payment.Transaction,
 		payment.RequestID,
 		payment.Currency,
@@ -40,9 +40,9 @@ func (p *paymentRepository) SaveTX(ctx context.Context, tx *sqlx.Tx, payment *en
 	return nil
 }
 
-func (p *paymentRepository) GetByID(ctx context.Context, id string) (*entity.Payment, error) {
+func (p *paymentRepository) GetByOrderID(ctx context.Context, id string) (*entity.Payment, error) {
 	payment := &entity.Payment{}
-	if err := p.db.GetContext(ctx, payment, getPaymentsByID, id); err != nil {
+	if err := p.db.GetContext(ctx, payment, getPaymentByOrderID, id); err != nil {
 		return nil, err
 	}
 	return payment, nil
