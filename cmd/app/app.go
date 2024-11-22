@@ -2,7 +2,6 @@ package app
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"wb_tech_l0/internal/infrastructure/config"
 	"wb_tech_l0/internal/infrastructure/database"
@@ -18,13 +17,11 @@ func (a *App) Init() error {
 		return err
 	}
 
-	fmt.Println(config.Global)
-
 	return nil
 }
 
 func (a *App) Start() error {
-	l, err := logger.NewLogger("log/log.log")
+	l, err := logger.NewLogger("./log/log.log")
 	if err != nil {
 		return err
 	}
@@ -53,6 +50,5 @@ func (a *App) getConfigPath() string {
 	}
 
 	flag.StringVar(&configPath, "config", "configs/static-config.yaml", "path to config file")
-	fmt.Println(configPath)
 	return configPath
 }

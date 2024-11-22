@@ -13,11 +13,10 @@ const (
 
 // TODO: В целом, можно было бы на методы разбить... но зачем?
 func NewLogger(logFilePath string) (*zap.Logger, error) {
-	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	return nil, err
+	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
+		return nil, err
 	}
-	defer file.Close()
 
 	jsonEncoderConfig := zap.NewProductionEncoderConfig()
 	jsonEncoderConfig.TimeKey = "time"
@@ -34,6 +33,7 @@ func NewLogger(logFilePath string) (*zap.Logger, error) {
 	consoleEncoderConfig.CallerKey = "caller"
 	consoleEncoderConfig.NameKey = "logger"
 	consoleEncoderConfig.MessageKey = "message"
+	jsonEncoderConfig.StacktraceKey = "stacktrace"
 	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig)
 
 	level, err := zap.ParseAtomicLevel(os.Getenv(LoggingLevelEnvParam))

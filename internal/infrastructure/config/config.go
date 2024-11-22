@@ -1,57 +1,59 @@
 package config
 
-import "github.com/spf13/viper"
+import (
+	"github.com/spf13/viper"
+)
 
-type config struct {
-	HttpServerConfig    httpServerConfig    `yaml:"http_server"`
-	LoggerConfig        loggerConfig        `yaml:"logger"`
-	PostgresConfig      postgresConfig      `yaml:"postgres"`
-	KafkaConsumerConfig kafkaConsumerConfig `yaml:"kafka_consumer"`
-	MemoryCacheConfig   memoryCacheConfig   `yaml:"memory_cache"`
+type Config struct {
+	HttpServerConfig    *HttpServerConfig    `yaml:"http_server" mapstructure:"http_server"`
+	LoggerConfig        *LoggerConfig        `yaml:"logger" mapstructure:"logger"`
+	PostgresConfig      *PostgresConfig      `yaml:"postgres" mapstructure:"postgres"`
+	KafkaConsumerConfig *KafkaConsumerConfig `yaml:"kafka_consumer" mapstructure:"kafka_consumer"`
+	MemoryCacheConfig   *MemoryCacheConfig   `yaml:"memory_cache" mapstructure:"memory_cache"`
 }
 
-type kafkaConsumerConfig struct {
-	Topic    string   `yaml:"topic"`
-	MaxBytes int      `yaml:"max_bytes"`
-	Brokers  []string `yaml:"brokers"`
+type KafkaConsumerConfig struct {
+	Topic    string   `yaml:"topic" mapstructure:"topic"`
+	MaxBytes int      `yaml:"max_bytes" mapstructure:"max_bytes"`
+	Brokers  []string `yaml:"brokers" mapstructure:"brokers"`
 }
 
-type loggerConfig struct {
-	Level    string `yaml:"level"`
-	Path     string `yaml:"path"`
-	MaxBytes int    `yaml:"max_bytes"`
+type LoggerConfig struct {
+	Level    string `yaml:"level" mapstructure:"level"`
+	Path     string `yaml:"path" mapstructure:"path"`
+	MaxBytes int    `yaml:"max_bytes" mapstructure:"max_bytes"`
 }
 
-type httpServerConfig struct {
-	Port string `yaml:"port"`
-	Host string `yaml:"host"`
+type HttpServerConfig struct {
+	Port string `yaml:"port" mapstructure:"port"`
+	Host string `yaml:"host" mapstructure:"host"`
 }
 
-type postgresConfig struct {
-	Host     string `yaml:"host"`
-	Port     string `yaml:"port"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	DBName   string `yaml:"dbname"`
-	sslmode  string `yaml:"sslmode"`
+type PostgresConfig struct {
+	Host     string `yaml:"host" mapstructure:"host"`
+	Port     string `yaml:"port" mapstructure:"port"`
+	User     string `yaml:"user" mapstructure:"user"`
+	Password string `yaml:"password" mapstructure:"password"`
+	DBName   string `yaml:"dbname" mapstructure:"dbname"`
+	SSLmode  string `yaml:"sslmode" mapstructure:"sslmode"`
 }
 
-type memoryCacheConfig struct {
-	Capacity int `yaml:"capacity"`
+type MemoryCacheConfig struct {
+	Capacity int `yaml:"capacity" mapstructure:"capacity"`
 }
 
 var (
-	Global *config
+	Global *Config
 )
 
 func InitConfig(configPath string) error {
 	v := viper.New()
 	setDefaults(v)
+	Global = new(Config)
 	if err := readConfig(v, configPath); err != nil {
 		return err
 	}
-
-	if err := v.Unmarshal(&Global); err != nil {
+	if err := v.Unmarshal(Global); err != nil {
 		return err
 	}
 	return nil
@@ -63,7 +65,7 @@ func setDefaults(v *viper.Viper) {
 
 	v.SetDefault("logger.level", "info")
 	v.SetDefault("logger.path", "./log/log.log")
-	v.SetDefault("logger.max_bytes", 10e6)
+	v.SetDefault("logger.max_bytes", 0)
 
 	v.SetDefault("postgres.host", "localhost")
 	v.SetDefault("postgres.port", "5432")
@@ -73,7 +75,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("postgres.sslmode", "disable")
 
 	v.SetDefault("kafka_consumer.topic", "orders")
-	v.SetDefault("kafka_consumer.max_bytes", 10e6)
+	v.SetDefault("kafka_consumer.max_bytes", 0)
 	v.SetDefault("kafka_consumer.brokers", []string{"localhost:9092"})
 
 	v.SetDefault("memory_cache.capacity", 10000)
