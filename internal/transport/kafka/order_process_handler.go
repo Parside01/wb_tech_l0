@@ -25,7 +25,11 @@ func NewOrderProcessHandler(service service.OrderService, consumer *broker.Kafka
 }
 
 func (h *OrderProcessHandler) Start(ctx context.Context) error {
-	return h.consumer.Consume(ctx, h.handleMessage)
+	for {
+		if err := h.consumer.ConsumeMessage(ctx, h.handleMessage); err != nil {
+			return err
+		}
+	}
 }
 
 func (h *OrderProcessHandler) handleMessage(ctx context.Context, message kafka.Message) error {

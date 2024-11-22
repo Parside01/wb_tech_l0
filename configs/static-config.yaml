@@ -1,0 +1,22 @@
+http_server:
+    port: 8080
+    host: "localhost"
+logger:
+    level: "info"
+    path: "./logs/log.log"
+    max_bytes: 10e7
+postgres:
+    host: "localhost"
+    port: 5432
+    user: "postgres"
+    password: "postgres"
+    dbname: "postgres"
+    sslmode: "disable"
+kafka_consumer:
+    topic: "orders"
+    max_bytes: 10e6
+    brokers:
+        - "kafka:9092"
+memory_cache:
+#   Max count objects in cache.
+    capacity: 10e6
