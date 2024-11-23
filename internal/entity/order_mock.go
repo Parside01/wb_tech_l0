@@ -52,7 +52,7 @@ func generateRandomPayment() *Payment {
 
 func generateRandomItems() []*Item {
 	var items []*Item
-	itemCount := gofakeit.Number(1, 5) // Случайное количество товаров от 1 до 5
+	itemCount := gofakeit.Number(1, 5)
 	for i := 0; i < itemCount; i++ {
 		items = append(items, &Item{
 			OrderID:     gofakeit.UUID(),

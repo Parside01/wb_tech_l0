@@ -46,7 +46,7 @@ func (h *OrderProcessHandler) loggingMiddleware(next broker.KafkaMessageHandler)
 	return func(ctx context.Context, message kafka.Message) error {
 		start := time.Now()
 
-		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
+		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)))
 
 		err := next(ctx, message)
 

@@ -26,9 +26,7 @@ const (
 			city TEXT NOT NULL,
 			address TEXT NOT NULL,
 			region TEXT NOT NULL,
-			email TEXT NOT NULL,
-		
-			FOREIGN KEY (order_id) REFERENCES orders(order_uid) ON DELETE CASCADE
+			email TEXT NOT NULL
 		);
 
 		CREATE TABLE IF NOT EXISTS payments
@@ -43,9 +41,7 @@ const (
 			bank TEXT NOT NULL,
 			delivery_cost BIGINT NOT NULL,
 			goods_total BIGINT NOT NULL,
-			custom_fee BIGINT NOT NULL,
-			
-			FOREIGN KEY (order_id) REFERENCES orders(order_uid) ON DELETE CASCADE
+			custom_fee BIGINT NOT NULL	
 		);
 
 		CREATE TABLE IF NOT EXISTS items
@@ -61,9 +57,7 @@ const (
 			total_price BIGINT NOT NULL,
 			nm_id BIGINT NOT NULL,
 			brand TEXT NOT NULL,
-			status BIGINT NOT NULL,
-			
-			FOREIGN KEY (order_id) REFERENCES orders(order_uid) ON DELETE CASCADE 
+			status BIGINT NOT NULL	
 		);
 	`
 

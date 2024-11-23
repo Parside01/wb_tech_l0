@@ -19,6 +19,8 @@ func NewKafkaConsumer() *KafkaConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  config.C.KafkaConfig.Brokers,
 		Topic:    config.C.KafkaConfig.Topic,
+		GroupID:  "kembekbmekbme",
+		MinBytes: 1,
 		MaxBytes: config.C.KafkaConfig.MaxBytes,
 	})
 	return &KafkaConsumer{
@@ -33,13 +35,8 @@ func (c *KafkaConsumer) ConsumeMessage(ctx context.Context, handler func(ctx con
 	if err != nil {
 		return fmt.Errorf("Error reading message from Kafka: %s", err)
 	}
-
 	if err := handler(ctx, message); err != nil {
 		return fmt.Errorf("Error processing message from Kafka: %s", err)
-	}
-
-	if err := c.reader.CommitMessages(ctx, message); err != nil {
-		return fmt.Errorf("Error committing message to Kafka: %s", err)
 	}
 	return nil
 }

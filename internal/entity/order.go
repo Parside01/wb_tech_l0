@@ -24,7 +24,7 @@ func (o *Order) Key() string {
 }
 
 type Delivery struct {
-	OrderID string `db:"order_id"`
+	OrderID string `db:"order_id" json:"-"`
 	Name    string `json:"name" db:"name"`
 	Phone   string `json:"phone" db:"phone"`
 	Zip     string `json:"zip" db:"zip"`
@@ -35,7 +35,7 @@ type Delivery struct {
 }
 
 type Payment struct {
-	OrderID      string `db:"order_id"`
+	OrderID      string `db:"order_id" json:"-"`
 	Transaction  string `json:"transaction" db:"transaction"`
 	RequestID    string `json:"request_id" db:"request_id"`
 	Currency     string `json:"currency" db:"currency"`
@@ -49,7 +49,7 @@ type Payment struct {
 }
 
 type Item struct {
-	OrderID     string `db:"order_id"`
+	OrderID     string `db:"order_id" json:"-"`
 	ChrtID      int    `json:"chrt_id" db:"chrt_id"`
 	TrackNumber string `json:"track_number" db:"track_number"`
 	Price       int    `json:"price" db:"price"`

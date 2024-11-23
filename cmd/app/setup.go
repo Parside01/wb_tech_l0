@@ -14,7 +14,9 @@ func (a *App) setupHandlers() error {
 	if err := a.setupOrderSpamHandler(); err != nil {
 		return err
 	}
-
+	if err := a.setupOrderGetHandler(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -26,12 +28,23 @@ func (a *App) setupHttpServer() {
 		a.orderSpamHandler.SpamOrders,
 		transport.LoggingMiddlewareEcho,
 	)
+
+	a.httpServer.GET(
+		"order/:id",
+		a.orderGetHandler.GetOrder,
+		transport.LoggingMiddlewareEcho,
+	)
+}
+
+func (a *App) setupOrderGetHandler() error {
+	a.orderGetHandler = transport.NewOrderGetHandler(a.orderService)
+	return nil
 }
 
 func (a *App) setupOrderProcessHandler() error {
-	orderService := service.NewOrderService(a.orderRepository, a.memoryCache)
+	a.orderService = service.NewOrderService(a.orderRepository, a.memoryCache)
 	consumer := broker.NewKafkaConsumer()
-	a.orderProcessHandler = transport.NewOrderProcessHandler(orderService, consumer)
+	a.orderProcessHandler = transport.NewOrderProcessHandler(a.orderService, consumer)
 
 	return nil
 }

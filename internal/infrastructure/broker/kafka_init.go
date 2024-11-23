@@ -29,7 +29,7 @@ func InitKafka() error {
 		{
 			Topic:             config.C.KafkaConfig.Topic,
 			NumPartitions:     config.C.KafkaConfig.NumPartitions,
-			ReplicationFactor: 1,
+			ReplicationFactor: config.C.KafkaConfig.ReplicationFactor,
 		},
 	}
 

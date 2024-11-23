@@ -3,6 +3,7 @@ package broker
 import (
 	"context"
 	"github.com/segmentio/kafka-go"
+	"time"
 	"wb_tech_l0/internal/infrastructure/config"
 )
 
@@ -12,9 +13,11 @@ type KafkaPublisher struct {
 
 func NewKafkaPublisher() *KafkaPublisher {
 	writer := &kafka.Writer{
-		Addr:     kafka.TCP(config.C.KafkaConfig.Brokers...),
-		Topic:    config.C.KafkaConfig.Topic,
-		Balancer: &kafka.LeastBytes{},
+		Addr:         kafka.TCP(config.C.KafkaConfig.Brokers...),
+		Topic:        config.C.KafkaConfig.Topic,
+		Balancer:     &kafka.LeastBytes{},
+		BatchSize:    100,
+		BatchTimeout: 5 * time.Millisecond,
 	}
 	return &KafkaPublisher{
 		writer: writer,

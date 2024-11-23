@@ -13,10 +13,12 @@ services:
     image: confluentinc/cp-kafka:latest
     ports:
       - "9092:9092"
+    hostname: kafka
     environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 1
     depends_on:
       - zookeeper
 
@@ -40,7 +42,6 @@ services:
       - kafka
       - postgres
       - zookeeper
-#    command: ["/bin/sh", "-c", "/app/wait-for-it.sh kafka:9092 -- ./app/app"]
-#    restart: always
+    command: ["/bin/sh", "-c", "/app/wait-for-it.sh kafka:9092 --timeout=60 --strict -- /app/app"]
 volumes:
   postgres_data:

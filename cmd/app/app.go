@@ -5,19 +5,23 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 	"os"
 	"sync"
 	"wb_tech_l0/internal/infrastructure/cache"
 	"wb_tech_l0/internal/infrastructure/config"
 	"wb_tech_l0/internal/repository"
+	"wb_tech_l0/internal/service"
 	"wb_tech_l0/internal/transport"
 )
 
 type App struct {
 	orderRepository     repository.OrderRepository
 	memoryCache         cache.Cache
+	orderService        service.OrderService
 	orderProcessHandler *transport.OrderProcessHandler
 	orderSpamHandler    *transport.OrderSpamHandler
+	orderGetHandler     *transport.OrderGetHandler
 	httpServer          *echo.Echo
 	errorsChan          chan error
 	wg                  sync.WaitGroup
@@ -38,7 +42,7 @@ func (a *App) Start() error {
 			return
 		}
 	}()
-
+	zap.L().Error("Сервер запустился")
 	go func() {
 		a.wg.Add(1)
 		defer a.wg.Done()
@@ -47,7 +51,8 @@ func (a *App) Start() error {
 			return
 		}
 	}()
-
+	zap.L().Error("Кафка тож")
+	a.wg.Wait()
 	return nil
 }
 
