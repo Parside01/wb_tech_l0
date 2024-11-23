@@ -50,6 +50,10 @@ func (a *App) Start() error {
 	if err := a.server.Start(fmt.Sprintf("%s:%s", config.Global.HttpServerConfig.Host, config.Global.HttpServerConfig.Port)); err != nil {
 		return err
 	}
+
+	if err := a.order_handler.Start(context.Background()); err != nil {
+		return err
+	}
 	return nil
 }
 

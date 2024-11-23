@@ -51,6 +51,7 @@ func (c *OrderSpamHandler) SpamOrders(e echo.Context) error {
 			e.Logger().Error(err)
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
+		point4 := time.Now()
 		log.Warnf("Generate: %d  Marshal: %d Publish: %d", point2.Unix()-point1.Unix(), point3.Unix()-point2.Unix(), point4.Unix()-point3.Unix())
 	}
 	return e.JSON(http.StatusOK, fmt.Sprintf("Success publish %d orders", count))
