@@ -8,7 +8,7 @@ import (
 )
 
 func InitKafka() error {
-	conn, err := kafka.Dial("tcp", config.Global.KafkaConfig.Brokers[0])
+	conn, err := kafka.Dial("tcp", config.C.KafkaConfig.Brokers[0])
 	if err != nil {
 		return err
 	}
@@ -27,8 +27,8 @@ func InitKafka() error {
 
 	topicConfig := []kafka.TopicConfig{
 		{
-			Topic:             config.Global.KafkaConfig.Topic,
-			NumPartitions:     config.Global.KafkaConfig.NumPartitions,
+			Topic:             config.C.KafkaConfig.Topic,
+			NumPartitions:     config.C.KafkaConfig.NumPartitions,
 			ReplicationFactor: 1,
 		},
 	}

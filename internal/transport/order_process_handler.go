@@ -13,23 +13,20 @@ import (
 
 type OrderProcessHandler struct {
 	service  service.OrderService
-	logger   *zap.Logger
 	consumer *broker.KafkaConsumer
 }
 
-func NewOrderProcessHandler(service service.OrderService, consumer *broker.KafkaConsumer, logger *zap.Logger) *OrderProcessHandler {
+func NewOrderProcessHandler(service service.OrderService, consumer *broker.KafkaConsumer) *OrderProcessHandler {
 	return &OrderProcessHandler{
 		service:  service,
-		logger:   logger,
 		consumer: consumer,
 	}
 }
 
 func (h *OrderProcessHandler) Start(ctx context.Context) error {
 	for {
-		if err := h.consumer.ConsumeMessage(ctx, h.loggingMiddleware(h.handleMessage)); err != nil {
-			return err
-		}
+		// Все ошибки и так будут логироваться, так что нет смысла что-то с ней делать.
+		_ = h.consumer.ConsumeMessage(ctx, h.loggingMiddleware(h.handleMessage))
 	}
 }
 
@@ -48,15 +45,16 @@ func (h *OrderProcessHandler) handleMessage(ctx context.Context, message kafka.M
 func (h *OrderProcessHandler) loggingMiddleware(next broker.KafkaMessageHandler) broker.KafkaMessageHandler {
 	return func(ctx context.Context, message kafka.Message) error {
 		start := time.Now()
-		h.logger.Info("Received message from kafka", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
+
+		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)), zap.String("value", string(message.Value)))
 
 		err := next(ctx, message)
 
 		duration := time.Since(start)
 		if err != nil {
-			h.logger.Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
+			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
 		} else {
-			h.logger.Info("Message processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
+			zap.L().Info("Message processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
 		}
 
 		return err

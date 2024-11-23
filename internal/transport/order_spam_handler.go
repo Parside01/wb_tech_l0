@@ -16,7 +16,7 @@ type OrderSpamHandler struct {
 	publisher *broker.KafkaPublisher
 }
 
-func NewOrderSpamHandler(e *echo.Echo, publisher *broker.KafkaPublisher) *OrderSpamHandler {
+func NewOrderSpamHandler(publisher *broker.KafkaPublisher) *OrderSpamHandler {
 	return &OrderSpamHandler{
 		publisher: publisher,
 	}

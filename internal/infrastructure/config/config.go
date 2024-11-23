@@ -45,17 +45,17 @@ type MemoryCacheConfig struct {
 }
 
 var (
-	Global *Config
+	C *Config
 )
 
 func InitConfig(configPath string) error {
 	v := viper.New()
 	setDefaults(v)
-	Global = new(Config)
+	C = new(Config)
 	if err := readConfig(v, configPath); err != nil {
 		return err
 	}
-	if err := v.Unmarshal(Global); err != nil {
+	if err := v.Unmarshal(C); err != nil {
 		return err
 	}
 	return nil

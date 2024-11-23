@@ -3,7 +3,7 @@ http_server:
     host: ""
 logger:
     level: "info"
-    path: "./logs/log.log"
+    path: "./log/log.log"
     max_bytes: 10e7
 postgres:
     host: "postgres"

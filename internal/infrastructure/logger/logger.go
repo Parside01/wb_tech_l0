@@ -11,11 +11,13 @@ const (
 	LoggingLevelEnvParam = "LOGGING_LEVEL"
 )
 
+var loggingFile *os.File
+
 // TODO: В целом, можно было бы на методы разбить... но зачем?
-func NewLogger(logFilePath string) (*zap.Logger, error) {
-	file, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
+func InitLogger(logFilePath string) error {
+	loggingFile, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	jsonEncoderConfig := zap.NewProductionEncoderConfig()
@@ -42,11 +44,17 @@ func NewLogger(logFilePath string) (*zap.Logger, error) {
 		level = zap.NewAtomicLevelAt(zap.InfoLevel)
 	}
 
-	fileCore := zapcore.NewCore(fileEncoder, zapcore.AddSync(file), level)
+	fileCore := zapcore.NewCore(fileEncoder, zapcore.AddSync(loggingFile), level)
 	consoleCore := zapcore.NewCore(consoleEncoder, zapcore.AddSync(os.Stdout), level)
 
 	core := zapcore.NewTee(fileCore, consoleCore)
 
 	logger := zap.New(core)
-	return logger, nil
+	zap.ReplaceGlobals(logger)
+
+	return nil
+}
+
+func Shutdown() error {
+	return loggingFile.Close()
 }

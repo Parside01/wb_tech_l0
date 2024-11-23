@@ -17,9 +17,9 @@ type KafkaMessageHandler = func(ctx context.Context, msg kafka.Message) error
 // Надо подумать чего с этим сделать.
 func NewKafkaConsumer() *KafkaConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  config.Global.KafkaConfig.Brokers,
-		Topic:    config.Global.KafkaConfig.Topic,
-		MaxBytes: config.Global.KafkaConfig.MaxBytes,
+		Brokers:  config.C.KafkaConfig.Brokers,
+		Topic:    config.C.KafkaConfig.Topic,
+		MaxBytes: config.C.KafkaConfig.MaxBytes,
 	})
 	return &KafkaConsumer{
 		reader: reader,

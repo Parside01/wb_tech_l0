@@ -1,4 +1,4 @@
-version: "3.9"
+version: '3.9'
 
 services:
   zookeeper:
@@ -32,6 +32,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   order_service:
+    container_name: "order-service"
     build: .
     ports:
       - "8080:8080"
@@ -39,8 +40,7 @@ services:
       - kafka
       - postgres
       - zookeeper
-    restart: always
-
-
+#    command: ["/bin/sh", "-c", "/app/wait-for-it.sh kafka:9092 -- ./app/app"]
+#    restart: always
 volumes:
   postgres_data:
