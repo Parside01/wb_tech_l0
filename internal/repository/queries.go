@@ -29,6 +29,8 @@ const (
 			email TEXT NOT NULL
 		);
 
+		CREATE INDEX IF NOT EXISTS idx_delivery_order_id ON delivery(order_id);
+
 		CREATE TABLE IF NOT EXISTS payments
 		(
 		    order_id TEXT PRIMARY KEY ,
@@ -44,6 +46,8 @@ const (
 			custom_fee BIGINT NOT NULL	
 		);
 
+		CREATE INDEX IF NOT EXISTS idx_payments_order_id ON payments(order_id);
+
 		CREATE TABLE IF NOT EXISTS items
 		(
 			order_id TEXT NOT NULL,
@@ -57,8 +61,12 @@ const (
 			total_price BIGINT NOT NULL,
 			nm_id BIGINT NOT NULL,
 			brand TEXT NOT NULL,
-			status BIGINT NOT NULL	
+			status BIGINT NOT NULL,
+			
+			PRIMARY KEY (order_id, chrt_id)
 		);
+	
+		CREATE INDEX IF NOT EXISTS idx_items_order_id ON items(order_id);
 	`
 
 	saveOrder = `
