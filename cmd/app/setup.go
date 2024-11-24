@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 	"wb_tech_l0/internal/infrastructure/broker"
 	"wb_tech_l0/internal/service"
 	"wb_tech_l0/internal/transport"
@@ -17,6 +18,7 @@ func (a *App) setupHandlers() error {
 	if err := a.setupOrderGetHandler(); err != nil {
 		return err
 	}
+	zap.L().Info("Finished setup handlers")
 	return nil
 }
 

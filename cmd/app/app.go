@@ -5,7 +5,6 @@ import (
 	"flag"
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 	"os"
 	"sync"
 	"wb_tech_l0/internal/infrastructure/cache"
@@ -33,8 +32,8 @@ func (a *App) Start() error {
 	}
 	a.setupHttpServer()
 
+	a.wg.Add(1)
 	go func() {
-		a.wg.Add(1)
 		defer a.wg.Done()
 
 		address := fmt.Sprintf("%s:%s", config.C.HttpServerConfig.Host, config.C.HttpServerConfig.Port)
@@ -42,16 +41,14 @@ func (a *App) Start() error {
 			return
 		}
 	}()
-	zap.L().Error("Сервер запустился")
+	a.wg.Add(1)
 	go func() {
-		a.wg.Add(1)
 		defer a.wg.Done()
 
 		if err := a.orderProcessHandler.Start(context.Background()); err != nil {
 			return
 		}
 	}()
-	zap.L().Error("Кафка тож")
 	a.wg.Wait()
 	return nil
 }

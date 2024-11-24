@@ -54,7 +54,7 @@ func (h *OrderProcessHandler) loggingMiddleware(next broker.KafkaMessageHandler)
 		if err != nil {
 			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
 		} else {
-			zap.L().Info("Message processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
+			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
 		}
 
 		return err

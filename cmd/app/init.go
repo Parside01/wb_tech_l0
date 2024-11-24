@@ -3,6 +3,8 @@ package app
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
+	"time"
 	"wb_tech_l0/internal/infrastructure/broker"
 	"wb_tech_l0/internal/infrastructure/cache"
 	"wb_tech_l0/internal/infrastructure/config"
@@ -12,21 +14,31 @@ import (
 )
 
 func (a *App) Init() error {
+	start := time.Now()
+
 	if err := a.initConfig(); err != nil {
 		return err
 	}
 	if err := a.initLogger(); err != nil {
 		return err
 	}
+	zap.L().Info("Config and logger are initialized", zap.Duration("Time from beginning init", time.Since(start)))
+
 	if err := a.initOrderRepository(); err != nil {
 		return err
 	}
+	zap.L().Info("Init repository", zap.Duration("Time from beginning init", time.Since(start)))
+
 	if err := a.initAndRestoreCache(); err != nil {
 		return err
 	}
+	zap.L().Info("Init cache", zap.Duration("Time from beginning init", time.Since(start)))
+
 	if err := a.initBroker(); err != nil {
 		return err
 	}
+	zap.L().Info("Init broker", zap.Duration("Time from beginning init", time.Since(start)))
+
 	return nil
 }
 

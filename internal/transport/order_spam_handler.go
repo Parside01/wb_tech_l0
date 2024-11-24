@@ -2,12 +2,10 @@ package transport
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 	"net/http"
 	"strconv"
-	"time"
 	"wb_tech_l0/internal/entity"
 	"wb_tech_l0/internal/infrastructure/broker"
 )
@@ -29,9 +27,9 @@ func (c *OrderSpamHandler) SpamOrders(e echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest)
 	}
 
-	count := int(count64)
-
-	for i := 0; i < count; i++ {
+	messages := make([]broker.KafkaMessage, count64)
+	response := make([]string, count64)
+	for i := range messages {
 		order := entity.GenerateRandomOrder()
 		data, err := json.Marshal(order)
 		if err != nil {
@@ -43,13 +41,15 @@ func (c *OrderSpamHandler) SpamOrders(e echo.Context) error {
 			e.Logger().Error(err)
 			return echo.NewHTTPError(http.StatusInternalServerError)
 		}
-
-		start := time.Now()
-		if err := c.publisher.PublishMessage(e.Request().Context(), key, data); err != nil {
-			e.Logger().Error(err)
-			return echo.NewHTTPError(http.StatusInternalServerError)
+		messages[i] = broker.KafkaMessage{
+			Key:   key,
+			Value: data,
 		}
-		zap.L().Warn("Success publish order", zap.String("ID", order.OrderUID), zap.String("duration", time.Since(start).String()))
+		response[i] = order.Key()
 	}
-	return e.JSON(http.StatusOK, fmt.Sprintf("Success publish %d orders", count))
+	if err := c.publisher.PublishMessages(e.Request().Context(), messages...); err != nil {
+		zap.L().Error("Failed publish messages", zap.Int64("Message count", count64), zap.Error(err))
+		return echo.NewHTTPError(http.StatusInternalServerError)
+	}
+	return e.JSON(http.StatusOK, response)
 }

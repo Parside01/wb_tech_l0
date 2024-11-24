@@ -11,25 +11,23 @@ type KafkaPublisher struct {
 	writer *kafka.Writer
 }
 
+type KafkaMessage = kafka.Message
+
 func NewKafkaPublisher() *KafkaPublisher {
 	writer := &kafka.Writer{
 		Addr:         kafka.TCP(config.C.KafkaConfig.Brokers...),
 		Topic:        config.C.KafkaConfig.Topic,
 		Balancer:     &kafka.LeastBytes{},
 		BatchSize:    100,
-		BatchTimeout: 5 * time.Millisecond,
+		BatchTimeout: 100 * time.Millisecond,
 	}
 	return &KafkaPublisher{
 		writer: writer,
 	}
 }
 
-func (k *KafkaPublisher) PublishMessage(ctx context.Context, key, data []byte) error {
-	message := kafka.Message{
-		Key:   key,
-		Value: data,
-	}
-	if err := k.writer.WriteMessages(ctx, message); err != nil {
+func (k *KafkaPublisher) PublishMessages(ctx context.Context, messages ...KafkaMessage) error {
+	if err := k.writer.WriteMessages(ctx, messages...); err != nil {
 		return err
 	}
 	return nil

@@ -14,6 +14,7 @@ type Config struct {
 
 type KafkaConfig struct {
 	Topic             string   `yaml:"topic" mapstructure:"topic"`
+	GroupID           string   `yaml:"group_id" mapstructure:"group_id"`
 	NumPartitions     int      `yaml:"num_partitions" mapstructure:"num_partitions"`
 	ReplicationFactor int      `yaml:"replication_factor" mapstructure:"replication_factor"`
 	MaxBytes          int      `yaml:"max_bytes" mapstructure:"max_bytes"`
@@ -77,6 +78,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("postgres.sslmode", "disable")
 
 	v.SetDefault("kafka.topic", "orders")
+	v.SetDefault("kafka.group_id", "order-group")
 	v.SetDefault("kafka.max_bytes", 0)
 	v.SetDefault("kafka.brokers", []string{"localhost:9092"})
 	v.SetDefault("kafka.num_partitions", 1)

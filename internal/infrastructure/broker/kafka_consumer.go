@@ -19,7 +19,7 @@ func NewKafkaConsumer() *KafkaConsumer {
 	reader := kafka.NewReader(kafka.ReaderConfig{
 		Brokers:  config.C.KafkaConfig.Brokers,
 		Topic:    config.C.KafkaConfig.Topic,
-		GroupID:  "kembekbmekbme",
+		GroupID:  config.C.KafkaConfig.GroupID,
 		MinBytes: 1,
 		MaxBytes: config.C.KafkaConfig.MaxBytes,
 	})

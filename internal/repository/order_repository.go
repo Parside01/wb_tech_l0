@@ -75,27 +75,26 @@ func (r *orderRepository) GetAll(ctx context.Context) (map[string]*entity.Order,
 	}
 
 	orders_map := make(map[string]*entity.Order)
-	for _, o := range orders {
-		delivery, err := r.delivery.GetByOrderID(ctx, o.OrderUID)
+	for _, order := range orders {
+		delivery, err := r.delivery.GetByOrderID(ctx, order.OrderUID)
 		if err != nil {
 			return nil, err
 		}
 
-		payment, err := r.payments.GetByOrderID(ctx, o.OrderUID)
+		payment, err := r.payments.GetByOrderID(ctx, order.OrderUID)
 		if err != nil {
 			return nil, err
 		}
 
-		items, err := r.items.GetAllByOrderID(ctx, o.OrderUID)
+		items, err := r.items.GetAllByOrderID(ctx, order.OrderUID)
 		if err != nil {
 			return nil, err
 		}
 
-		order := &entity.Order{}
 		order.Delivery = delivery
 		order.Payment = payment
 		order.Items = items
-		orders_map[o.OrderUID] = order
+		orders_map[order.OrderUID] = order
 	}
 
 	return orders_map, nil
