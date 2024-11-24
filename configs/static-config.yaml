@@ -18,7 +18,7 @@ kafka:
     max_bytes: 10e6
     replication_factor: 1
     brokers:
-        - "kafka:9092"
+        - "kafka:29092"
 memory_cache:
 #   Max count objects in cache.
     capacity: 10e6
