@@ -2,8 +2,10 @@ package app
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"go.uber.org/zap"
+	"os"
 	"time"
 	"wb_tech_l0/internal/infrastructure/broker"
 	"wb_tech_l0/internal/infrastructure/cache"
@@ -43,7 +45,7 @@ func (a *App) Init() error {
 }
 
 func (a *App) initConfig() error {
-	configPath := a.getConfigPath()
+	configPath := a.parseConfigPath()
 	if err := config.InitConfig(configPath); err != nil {
 		return err
 	}
@@ -94,4 +96,14 @@ func (a *App) initAndRestoreCache() error {
 	}
 
 	return nil
+}
+
+func (a *App) parseConfigPath() string {
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath != "" {
+		return configPath
+	}
+
+	flag.StringVar(&configPath, "config", "configs/static-config.yaml", "path to config file")
+	return configPath
 }

@@ -7,33 +7,37 @@ import (
 	"wb_tech_l0/internal/infrastructure/config"
 )
 
-type KafkaPublisher struct {
+type KafkaMessage = kafka.Message
+
+type KafkaPublisher interface {
+	PublishMessages(ctx context.Context, messages ...KafkaMessage) error
+	Close() error
+}
+
+type kafkaPublisher struct {
 	writer *kafka.Writer
 }
 
-type KafkaMessage = kafka.Message
-
-func NewKafkaPublisher() *KafkaPublisher {
+func NewKafkaPublisher() KafkaPublisher {
 	writer := &kafka.Writer{
 		Addr:         kafka.TCP(config.C.KafkaConfig.Brokers...),
 		Topic:        config.C.KafkaConfig.Topic,
 		Balancer:     &kafka.LeastBytes{},
 		BatchSize:    100,
-		BatchTimeout: 100 * time.Millisecond,
+		BatchTimeout: 10 * time.Millisecond,
 	}
-	return &KafkaPublisher{
+	return &kafkaPublisher{
 		writer: writer,
 	}
 }
 
-func (k *KafkaPublisher) PublishMessages(ctx context.Context, messages ...KafkaMessage) error {
+func (k *kafkaPublisher) PublishMessages(ctx context.Context, messages ...KafkaMessage) error {
 	if err := k.writer.WriteMessages(ctx, messages...); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (k *KafkaPublisher) Close() error {
-	k.writer.Stats()
+func (k *kafkaPublisher) Close() error {
 	return k.writer.Close()
 }

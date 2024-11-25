@@ -2,11 +2,12 @@ package app
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"os"
+	"os/signal"
 	"sync"
+	"syscall"
 	"wb_tech_l0/internal/infrastructure/cache"
 	"wb_tech_l0/internal/infrastructure/config"
 	"wb_tech_l0/internal/repository"
@@ -40,6 +41,7 @@ func (a *App) Start() error {
 			return
 		}
 	}()
+
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
@@ -48,16 +50,17 @@ func (a *App) Start() error {
 			return
 		}
 	}()
-	a.wg.Wait()
+
 	return nil
 }
 
-func (a *App) getConfigPath() string {
-	configPath := os.Getenv("CONFIG_PATH")
-	if configPath != "" {
-		return configPath
-	}
+func (a *App) Wait() {
+	a.wg.Wait()
 
-	flag.StringVar(&configPath, "config", "configs/static-config.yaml", "path to config file")
-	return configPath
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
+	<-c
+
+	a.shutdown()
+	os.Exit(0)
 }

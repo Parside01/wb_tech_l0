@@ -14,9 +14,8 @@ import (
 
 type OrderProcessHandler struct {
 	service  service.OrderService
-	consumer *broker.KafkaConsumer
+	consumer broker.KafkaConsumer
 	workers  *workerpool.WorkerPool
-	metrics  metric
 }
 
 type metric struct {
@@ -24,26 +23,27 @@ type metric struct {
 	mutex             sync.Mutex
 }
 
-func NewOrderProcessHandler(service service.OrderService, consumer *broker.KafkaConsumer) *OrderProcessHandler {
+func NewOrderProcessHandler(service service.OrderService, consumer broker.KafkaConsumer) *OrderProcessHandler {
 	return &OrderProcessHandler{
 		service:  service,
 		consumer: consumer,
 		workers:  workerpool.New(50),
-		metrics: metric{
-			ProcessedReqCount: 0,
-			mutex:             sync.Mutex{},
-		},
 	}
 }
 
 func (h *OrderProcessHandler) Start(ctx context.Context) error {
-	go h.startMetricsLogger()
 	for i := 0; i < h.workers.Size(); i++ {
 		h.workers.Submit(func() {
 			h.listenAndProcessMessages(ctx)
 		})
 	}
 	return nil
+}
+
+func (h *OrderProcessHandler) Shutdown() error {
+	h.workers.StopWait()
+	err := h.consumer.Close()
+	return err
 }
 
 func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
@@ -65,20 +65,6 @@ func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 	}
 }
 
-func (h *OrderProcessHandler) startMetricsLogger() {
-	ticker := time.NewTicker(1 * time.Second)
-	defer ticker.Stop()
-	average := int64(0)
-	for range ticker.C {
-		h.metrics.mutex.Lock()
-		average = max(average, h.metrics.ProcessedReqCount)
-		h.metrics.ProcessedReqCount = 0
-		h.metrics.mutex.Unlock()
-
-		zap.L().Warn("", zap.Int64("RPS", average))
-	}
-}
-
 func (h *OrderProcessHandler) processMessage(ctx context.Context, message broker.KafkaMessage) error {
 	var order *entity.Order
 	if err := json.Unmarshal(message.Value, &order); err != nil {
@@ -87,10 +73,6 @@ func (h *OrderProcessHandler) processMessage(ctx context.Context, message broker
 	if err := h.service.SaveOrder(ctx, order); err != nil {
 		return err
 	}
-
-	h.metrics.mutex.Lock()
-	h.metrics.ProcessedReqCount++
-	h.metrics.mutex.Unlock()
 
 	return nil
 }

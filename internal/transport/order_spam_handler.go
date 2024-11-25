@@ -11,13 +11,18 @@ import (
 )
 
 type OrderSpamHandler struct {
-	publisher *broker.KafkaPublisher
+	publisher broker.KafkaPublisher
 }
 
-func NewOrderSpamHandler(publisher *broker.KafkaPublisher) *OrderSpamHandler {
+func NewOrderSpamHandler(publisher broker.KafkaPublisher) *OrderSpamHandler {
 	return &OrderSpamHandler{
 		publisher: publisher,
 	}
+}
+
+func (c *OrderSpamHandler) Shutdown() error {
+	err := c.publisher.Close()
+	return err
 }
 
 func (c *OrderSpamHandler) SpamOrders(e echo.Context) error {

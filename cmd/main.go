@@ -13,4 +13,5 @@ func main() {
 	if err := a.Start(); err != nil {
 		panic(err)
 	}
+	a.Wait()
 }
