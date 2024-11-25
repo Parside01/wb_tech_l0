@@ -22,7 +22,6 @@ type App struct {
 	orderSpamHandler    *transport.OrderSpamHandler
 	orderGetHandler     *transport.OrderGetHandler
 	httpServer          *echo.Echo
-	errorsChan          chan error
 	wg                  sync.WaitGroup
 }
 
@@ -54,8 +53,7 @@ func (a *App) Start() error {
 }
 
 func (a *App) getConfigPath() string {
-	var configPath string
-	configPath = os.Getenv("CONFIG_PATH")
+	configPath := os.Getenv("CONFIG_PATH")
 	if configPath != "" {
 		return configPath
 	}

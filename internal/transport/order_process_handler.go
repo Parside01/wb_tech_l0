@@ -3,7 +3,7 @@ package transport
 import (
 	"context"
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
+	"github.com/gammazero/workerpool"
 	"go.uber.org/zap"
 	"sync"
 	"time"
@@ -13,10 +13,10 @@ import (
 )
 
 type OrderProcessHandler struct {
-	service      service.OrderService
-	consumer     *broker.KafkaConsumer
-	workersCount int
-	metrics      metric
+	service  service.OrderService
+	consumer *broker.KafkaConsumer
+	workers  *workerpool.WorkerPool
+	metrics  metric
 }
 
 type metric struct {
@@ -26,9 +26,9 @@ type metric struct {
 
 func NewOrderProcessHandler(service service.OrderService, consumer *broker.KafkaConsumer) *OrderProcessHandler {
 	return &OrderProcessHandler{
-		service:      service,
-		consumer:     consumer,
-		workersCount: 100,
+		service:  service,
+		consumer: consumer,
+		workers:  workerpool.New(50),
 		metrics: metric{
 			ProcessedReqCount: 0,
 			mutex:             sync.Mutex{},
@@ -37,18 +37,32 @@ func NewOrderProcessHandler(service service.OrderService, consumer *broker.Kafka
 }
 
 func (h *OrderProcessHandler) Start(ctx context.Context) error {
-	wg := &sync.WaitGroup{}
-	for i := 0; i < h.workersCount; i++ {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-			h.startWorker(ctx)
-		}()
-	}
 	go h.startMetricsLogger()
-	wg.Wait()
+	for i := 0; i < h.workers.Size(); i++ {
+		h.workers.Submit(func() {
+			h.listenAndProcessMessages(ctx)
+		})
+	}
 	return nil
+}
+
+func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
+	for {
+		message, err := h.consumer.ConsumeMessage(ctx)
+		if err != nil {
+			zap.L().Error("Failed to received message", zap.Error(err))
+			return
+		}
+
+		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)))
+		start := time.Now()
+
+		if err := h.processMessage(ctx, message); err != nil {
+			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", time.Since(start)))
+		} else {
+			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", time.Since(start)))
+		}
+	}
 }
 
 func (h *OrderProcessHandler) startMetricsLogger() {
@@ -65,7 +79,7 @@ func (h *OrderProcessHandler) startMetricsLogger() {
 	}
 }
 
-func (h *OrderProcessHandler) handleMessage(ctx context.Context, message broker.KafkaMessage) error {
+func (h *OrderProcessHandler) processMessage(ctx context.Context, message broker.KafkaMessage) error {
 	var order *entity.Order
 	if err := json.Unmarshal(message.Value, &order); err != nil {
 		return err
@@ -79,44 +93,4 @@ func (h *OrderProcessHandler) handleMessage(ctx context.Context, message broker.
 	h.metrics.mutex.Unlock()
 
 	return nil
-}
-
-func (h *OrderProcessHandler) startWorker(ctx context.Context) {
-	for {
-		message, err := h.consumer.ConsumeMessage(ctx)
-		if err != nil {
-			zap.L().Error("Failed to consume message", zap.Error(err))
-			continue
-		}
-
-		start := time.Now()
-
-		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)))
-
-		if err := h.handleMessage(ctx, message); err != nil {
-			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", time.Since(start)))
-		} else {
-			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", time.Since(start)))
-		}
-
-	}
-}
-
-func (h *OrderProcessHandler) loggingMiddleware(next broker.KafkaMessageHandler) broker.KafkaMessageHandler {
-	return func(ctx context.Context, message kafka.Message) error {
-		start := time.Now()
-
-		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)))
-
-		err := next(ctx, message)
-
-		duration := time.Since(start)
-		if err != nil {
-			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
-		} else {
-			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
-		}
-
-		return err
-	}
 }

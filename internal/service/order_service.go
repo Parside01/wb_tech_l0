@@ -30,7 +30,7 @@ func NewOrderService(repo repository.OrderRepository, cache cache.Cache) OrderSe
 }
 
 // TODO: Не знаю на самом деле, кешировать это точно обязанность сервиса?
-// TODO: Нам нужно учитывать случай, когда пришел дубликат существуещего заказа?
+// TODO: Нам нужно учитывать случай, когда пришел дубликат существуещего заказа? (Пока будем счиать, что это не наша забота)
 func (s *orderService) SaveOrder(ctx context.Context, order *entity.Order) error {
 	order.Delivery.OrderID = order.OrderUID
 	order.Payment.OrderID = order.OrderUID
