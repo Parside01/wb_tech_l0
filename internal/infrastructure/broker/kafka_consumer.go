@@ -8,6 +8,8 @@ import (
 
 type KafkaConsumer interface {
 	ConsumeMessage(ctx context.Context) (KafkaMessage, error)
+	FetchMessage(ctx context.Context) (KafkaMessage, error)
+	CommitMessages(ctx context.Context, msg KafkaMessage) error
 	Close() error
 }
 
@@ -34,4 +36,12 @@ func (c *kafkaConsumer) ConsumeMessage(ctx context.Context) (KafkaMessage, error
 
 func (c *kafkaConsumer) Close() error {
 	return c.reader.Close()
+}
+
+func (c *kafkaConsumer) FetchMessage(ctx context.Context) (KafkaMessage, error) {
+	return c.reader.FetchMessage(ctx)
+}
+
+func (c *kafkaConsumer) CommitMessages(ctx context.Context, msg KafkaMessage) error {
+	return c.reader.CommitMessages(ctx, msg)
 }

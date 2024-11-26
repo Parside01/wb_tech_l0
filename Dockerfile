@@ -8,7 +8,7 @@ RUN go mod download
 COPY . .
 
 
-RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.0
+#RUN go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.0
 
 RUN go build -o app ./cmd/main.go
 

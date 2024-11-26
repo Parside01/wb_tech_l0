@@ -22,3 +22,9 @@ kafka:
 memory_cache:
 #   Max count objects in cache.
     capacity: 10e6
+
+new_relic:
+    app_name: "order-service"
+    license: "Apache-2.0"
+sentry:
+    dsn: ""

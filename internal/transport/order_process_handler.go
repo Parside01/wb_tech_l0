@@ -48,7 +48,7 @@ func (h *OrderProcessHandler) Shutdown() error {
 
 func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 	for {
-		message, err := h.consumer.ConsumeMessage(ctx)
+		message, err := h.consumer.FetchMessage(ctx)
 		if err != nil {
 			zap.L().Error("Failed to received message", zap.Error(err))
 			return
@@ -61,6 +61,10 @@ func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", time.Since(start)))
 		} else {
 			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", time.Since(start)))
+
+			if err := h.consumer.CommitMessages(ctx, message); err != nil {
+				zap.L().Error("Failed commit message", zap.String("key", string(message.Key)), zap.Error(err))
+			}
 		}
 	}
 }
