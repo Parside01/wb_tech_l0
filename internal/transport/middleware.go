@@ -2,27 +2,23 @@ package transport
 
 import (
 	"github.com/labstack/echo/v4"
-	"go.uber.org/zap"
 	"time"
+	"wb_tech_l0/internal/transport/metrics"
 )
 
-func LoggingMiddlewareEcho(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(e echo.Context) error {
+func RequestDurationMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
 		start := time.Now()
-		err := next(e)
-		duration := time.Since(start)
-
-		zap.L().Info("Handled request",
-			zap.String("method", e.Request().Method),
-			zap.String("path", e.Request().URL.Path),
-			zap.String("duration", duration.String()),
-		)
-
-		if err != nil {
-			zap.L().Error("Request failed",
-				zap.Error(err),
-			)
-		}
+		err := next(c)
+		duration := time.Since(start).Seconds()
+		metrics.HttpRequestDuration.WithLabelValues(c.Request().URL.Path).Observe(duration)
 		return err
+	}
+}
+
+func RequestCountMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		metrics.HttpRequestCountWithPath.WithLabelValues(c.Request().URL.Path).Inc()
+		return next(c)
 	}
 }

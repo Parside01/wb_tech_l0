@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"github.com/gammazero/workerpool"
 	"go.uber.org/zap"
-	"sync"
 	"time"
 	"wb_tech_l0/internal/entity"
 	"wb_tech_l0/internal/infrastructure/broker"
 	"wb_tech_l0/internal/service"
+	"wb_tech_l0/internal/transport/metrics"
 )
 
 type OrderProcessHandler struct {
@@ -18,10 +18,8 @@ type OrderProcessHandler struct {
 	workers  *workerpool.WorkerPool
 }
 
-type metric struct {
-	ProcessedReqCount int64
-	mutex             sync.Mutex
-}
+type Handler func(ctx context.Context, args ...interface{}) error
+type Middleware func(Handler) Handler
 
 func NewOrderProcessHandler(service service.OrderService, consumer broker.KafkaConsumer) *OrderProcessHandler {
 	return &OrderProcessHandler{
@@ -55,17 +53,22 @@ func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 		}
 
 		zap.L().Info("Received message from kafka", zap.String("key", string(message.Key)))
-		start := time.Now()
+		metrics.KafkaMessagesReceivedCount.WithLabelValues(message.Topic).Inc()
 
-		if err := h.processMessage(ctx, message); err != nil {
-			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", time.Since(start)))
+		start := time.Now()
+		err = h.processMessage(ctx, message)
+		duration := time.Since(start)
+
+		if err != nil {
+			zap.L().Error("Error processing message", zap.String("key", string(message.Key)), zap.Error(err), zap.Duration("processing_time", duration))
 		} else {
-			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", time.Since(start)))
+			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
 
 			if err := h.consumer.CommitMessages(ctx, message); err != nil {
 				zap.L().Error("Failed commit message", zap.String("key", string(message.Key)), zap.Error(err))
 			}
 		}
+		metrics.KafkaMessageProcessingDuration.WithLabelValues(message.Topic).Observe(duration.Seconds())
 	}
 }
 

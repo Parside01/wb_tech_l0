@@ -100,7 +100,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("newrelic.app_name", "order_service")
 	v.SetDefault("newrelic.license", "Apache-2.0")
 
-	v.SetDefault("sentry.dsn", "")
+	v.SetDefault("sentry.dsn", "FREE_DNS")
 }
 
 func readConfig(v *viper.Viper, configPath string) error {
