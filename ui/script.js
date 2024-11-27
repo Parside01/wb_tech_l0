@@ -146,7 +146,7 @@ async function fetchOrderById(orderId) {
         lastGetOrderDetails = orderData;
         displayOrderDetails(orderData);
     } catch (error) {
-        console.error('Ошибка при получении заказа:', error);
+        console.error('Failed to fetch order:', error);
     }
 }
 
@@ -167,6 +167,6 @@ async function fetchSpamOrders(count) {
         lastSpamOrderIDs = spamData;
         displaySpamOrderIds(spamData);
     } catch (error) {
-        console.error('Ошибка при получении спамов:', error);
+        console.error('Failed to fetch spam orders:', error);
     }
 }

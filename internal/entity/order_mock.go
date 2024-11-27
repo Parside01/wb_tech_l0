@@ -7,9 +7,9 @@ func GenerateRandomOrder() *Order {
 		OrderUID:          gofakeit.UUID(),
 		TrackNumber:       gofakeit.UUID(),
 		Entry:             gofakeit.Word(),
-		Delivery:          generateRandomDelivery(),
-		Payment:           generateRandomPayment(),
-		Items:             generateRandomItems(),
+		Delivery:          GenerateRandomDelivery(),
+		Payment:           GenerateRandomPayment(),
+		Items:             GenerateRandomItems(),
 		Locate:            gofakeit.City(),
 		InternalSignature: gofakeit.Word(),
 		CustomerID:        gofakeit.UUID(),
@@ -21,7 +21,7 @@ func GenerateRandomOrder() *Order {
 	}
 }
 
-func generateRandomDelivery() *Delivery {
+func GenerateRandomDelivery() *Delivery {
 	return &Delivery{
 		OrderID: gofakeit.UUID(),
 		Name:    gofakeit.Name(),
@@ -34,7 +34,7 @@ func generateRandomDelivery() *Delivery {
 	}
 }
 
-func generateRandomPayment() *Payment {
+func GenerateRandomPayment() *Payment {
 	return &Payment{
 		OrderID:      gofakeit.UUID(),
 		Transaction:  gofakeit.UUID(),
@@ -50,7 +50,7 @@ func generateRandomPayment() *Payment {
 	}
 }
 
-func generateRandomItems() []*Item {
+func GenerateRandomItems() []*Item {
 	var items []*Item
 	itemCount := gofakeit.Number(1, 5)
 	for i := 0; i < itemCount; i++ {
@@ -70,4 +70,21 @@ func generateRandomItems() []*Item {
 		})
 	}
 	return items
+}
+
+func GenerateRandomItem() *Item {
+	return &Item{
+		OrderID:     gofakeit.UUID(),
+		ChrtID:      gofakeit.Number(1, 10000),
+		TrackNumber: gofakeit.UUID(),
+		Price:       gofakeit.Number(100, 1000),
+		RID:         gofakeit.UUID(),
+		Name:        gofakeit.Word(),
+		Sale:        gofakeit.Number(0, 100),
+		Size:        gofakeit.Word(),
+		TotalPrice:  gofakeit.Number(100, 1000),
+		NMID:        gofakeit.Number(1, 1000),
+		Brand:       gofakeit.Word(),
+		Status:      gofakeit.Number(1, 5),
+	}
 }
