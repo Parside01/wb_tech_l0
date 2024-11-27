@@ -44,6 +44,7 @@ func (h *OrderProcessHandler) Shutdown() error {
 	return err
 }
 
+// Вообще не знаю как сделать это чуточку компактнее.
 func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 	for {
 		message, err := h.consumer.FetchMessage(ctx)
