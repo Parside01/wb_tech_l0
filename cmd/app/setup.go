@@ -3,6 +3,7 @@ package app
 import (
 	"github.com/brpaz/echozap"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"wb_tech_l0/internal/infrastructure/broker"
@@ -34,6 +35,7 @@ func (a *App) setupHttpServer() {
 
 	v1 := a.httpServer.Group("/api/v1/order")
 	v1.Use(echozap.ZapLogger(zap.L()), transport.RequestCountMiddleware, transport.RequestDurationMiddleware)
+	v1.Use(middleware.CORS())
 	v1.POST(
 		"/spam",
 		a.orderSpamHandler.SpamOrders,

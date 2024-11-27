@@ -68,9 +68,20 @@ services:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+  order_service_ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      SERVICE_BASE_URL: "order_service:8080/api/v1"
 
 volumes:
   postgres_data:
+  grafana-storage:
 networks:
   default:
     driver: bridge

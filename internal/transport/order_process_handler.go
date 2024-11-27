@@ -64,7 +64,7 @@ func (h *OrderProcessHandler) listenAndProcessMessages(ctx context.Context) {
 		} else {
 			zap.L().Info("KafkaMessage processed successfully", zap.String("key", string(message.Key)), zap.Duration("processing_time", duration))
 
-			if err := h.consumer.CommitMessages(ctx, message); err != nil {
+			if err = h.consumer.CommitMessages(ctx, message); err != nil {
 				zap.L().Error("Failed commit message", zap.String("key", string(message.Key)), zap.Error(err))
 			}
 		}

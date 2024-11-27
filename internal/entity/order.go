@@ -6,8 +6,8 @@ type Order struct {
 	OrderUID          string    `json:"order_uid" db:"order_uid"`
 	TrackNumber       string    `json:"track_number" db:"track_number"`
 	Entry             string    `json:"entry" db:"entry"`
-	Delivery          *Delivery `json:"Delivery" db:"Delivery"`
-	Payment           *Payment  `json:"Payment" db:"Payment"`
+	Delivery          *Delivery `json:"delivery" db:"delivery"`
+	Payment           *Payment  `json:"payment" db:"payment"`
 	Items             []*Item   `json:"items" db:"items"`
 	Locate            string    `json:"locate" db:"locate"`
 	InternalSignature string    `json:"internal_signature" db:"internal_signature"`
