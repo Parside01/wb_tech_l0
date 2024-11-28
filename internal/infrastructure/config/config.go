@@ -44,12 +44,13 @@ type HttpServerConfig struct {
 }
 
 type PostgresConfig struct {
-	Host     string `yaml:"host" mapstructure:"host"`
-	Port     string `yaml:"port" mapstructure:"port"`
-	User     string `yaml:"user" mapstructure:"user"`
-	Password string `yaml:"password" mapstructure:"password"`
-	DBName   string `yaml:"dbname" mapstructure:"dbname"`
-	SSLmode  string `yaml:"sslmode" mapstructure:"sslmode"`
+	Host       string `yaml:"host" mapstructure:"host"`
+	Port       string `yaml:"port" mapstructure:"port"`
+	User       string `yaml:"user" mapstructure:"user"`
+	Migrations string `yaml:"migrations" mapstructure:"migrations"`
+	Password   string `yaml:"password" mapstructure:"password"`
+	DBName     string `yaml:"dbname" mapstructure:"dbname"`
+	SSLmode    string `yaml:"sslmode" mapstructure:"sslmode"`
 }
 
 type MemoryCacheConfig struct {
@@ -86,6 +87,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("postgres.user", "postgres")
 	v.SetDefault("postgres.password", "postgres")
 	v.SetDefault("postgres.dbname", "postgres")
+	v.SetDefault("postgres.migrations", "internal/infrastructure/database/migrations")
 	v.SetDefault("postgres.sslmode", "disable")
 
 	v.SetDefault("kafka.topic", "orders")

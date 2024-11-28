@@ -25,12 +25,7 @@ func NewOrderRepository(db *sqlx.DB) OrderRepository {
 		delivery: NewDeliveryRepository(db),
 		payments: NewPaymentRepository(db),
 	}
-	repo.Init()
 	return repo
-}
-
-func (r *orderRepository) Init() {
-	r.db.MustExec(scheme)
 }
 
 func (r *orderRepository) Save(ctx context.Context, order *entity.Order) error {

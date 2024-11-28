@@ -105,7 +105,7 @@ function displaySpamOrderIds(ordersIds) {
 }
 
 
-const baseApiUrl = process.env.SERVICE_BASE_URL || 'http://localhost:8080/api/v1';
+const baseApiUrl = 'http://localhost:8080/api/v1';
 const getOrderUrl = `${baseApiUrl}/order/:id`;
 const spamOrderUrl = `${baseApiUrl}/order/spam?count=`;
 

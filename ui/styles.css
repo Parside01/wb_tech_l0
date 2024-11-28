@@ -2,7 +2,7 @@
     --color-primary: #1976d2;
     --tab-width: 300px;
     --button-width: 64px;
-    --button-count: 2;
+    --button-count: 3;
 }
 
 * {
@@ -56,6 +56,11 @@ h2{
     font-weight: 400;
 }
 
+h4 {
+    font-weight: 300;
+}
+
+
 .container {
     display: flex;
     align-items: center;
@@ -72,7 +77,7 @@ h2{
     top: 0;
     left: 0;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     width: calc(var(--tab-width) * var(--button-count));
     transition: 0.3s;
 }
@@ -122,8 +127,13 @@ p{
     translate: var(--button-width) 0;
 }
 
+.tabs input:nth-child(3):checked ~ .buttons .underline{
+    translate: calc(var(--button-width) * 2) 0;
+}
+
 .tabs input:nth-child(1):checked ~ .buttons label:nth-child(1),
-.tabs input:nth-child(2):checked ~ .buttons label:nth-child(2){
+.tabs input:nth-child(2):checked ~ .buttons label:nth-child(2),
+.tabs input:nth-child(3):checked ~ .buttons label:nth-child(3){
     opacity: 1;
 }
 
@@ -135,12 +145,15 @@ p{
     translate: calc(0px - var(--tab-width)) 0;
 }
 
+.tabs input:nth-child(3):checked ~ .content > .content-inner{
+    translate: calc(0px - calc(var(--tab-width) * 2)) 0;
+}
 
 .order-widget {
     width: 300px;
     height: 300px;
-    margin-right: 20px;
-    padding: 15px;
+    margin-right: 25px;
+    padding: 20px;
     border-radius: 8px;
     background: #17181a;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
@@ -152,7 +165,7 @@ p{
     top: 55px;
     left: 0px;
     right: 0px;
-    max-height: 300px;
+    max-height: 250px;
     overflow: auto;
     padding: 10px;
     border-radius: 5px;
@@ -189,12 +202,24 @@ p{
     color: white;
 }
 
+strong {
+    color: white;
+}
+
 .open-button:hover {
     background-color: #252323;
 }
 
 .widget-container {
     position: relative;
+}
+
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
 }
 
 
@@ -234,4 +259,16 @@ button:hover {
 
 button:active {
     transform: scale(0.95);
+}
+
+.grafana-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.grafana-icon {
+    width: 120px;
+    height: auto;
+    margin-left: 60px;
+    margin-top: 10px;
 }

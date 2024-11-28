@@ -78,6 +78,9 @@ func (a *App) initOrderRepository() error {
 	if err != nil {
 		return err
 	}
+	if err = database.Migrate(db); err != nil {
+		return err
+	}
 
 	a.orderRepository = repository.NewOrderRepository(db)
 	return nil

@@ -6,58 +6,67 @@
     <link rel="stylesheet" href="./styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
+          rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
     <title>Order Service</title>
 </head>
 <body>
-    
-    <div class="container">
-        <div class="order-widget" id="order-widget">
-            <label id="close-button" class="material-symbols-outlined">chevron_left</label>
 
-            <h2>Last Response</h2>
-            <div id="details"></div>
-        </div>
+<div class="container">
+    <div class="order-widget" id="order-widget">
+        <label id="close-button" class="material-symbols-outlined">chevron_left</label>
 
-        <div class="widget-container">
-
-            <div class="widget">
-                <div class="tabs">
-                
-                    <input type="radio" name="group", id="get-order" checked>
-                    <input type="radio" name="group", id="spam-order">
-    
-                    <div class="buttons">
-                        <label for="get-order" class="material-symbols-outlined">search</label>
-                        <label for="spam-order" class="material-symbols-outlined">arrow_downward</label>
-                        <div class="underline"></div>
-                    </div>
-    
-                    <div class="content">
-                        <div class="content-inner">
-                            <div>
-                                <h2>Get by ID</h2>
-                                <input type="text" class="visible" id="order-id-input" placeholder="Enter order ID" />
-                                <button id="submit-order-id">Enter</button>
-                            </div>
-                            <div>
-                                <h2>Spam Orders</h2>
-                                <input type="number" class="visible" id="spam-id-input" placeholder="Enter orders count" />
-                                <button id="submit-spam-count">Enter</button>
-                            </div>
-                        </div>
-                    </div>
-    
-                </div>
-            </div>
-            
-            <div class="open-button" id="open-button" style="display: none;">
-                <label class="material-symbols-outlined">chevron_right</label>
-            </div>
-        </div>
+        <h2>Last Response</h2>
+        <div id="details"></div>
     </div>
 
-    <script src="script.js" defer></script>
+    <div class="widget-container">
+
+        <div class="widget">
+            <div class="tabs">
+
+                <input type="radio" name="group", id="get-order" checked>
+                <input type="radio" name="group", id="spam-order">
+                <input type="radio" name="group", id="metrics">
+
+                <div class="buttons">
+                    <label for="get-order" class="material-symbols-outlined">search</label>
+                    <label for="spam-order" class="material-symbols-outlined">arrow_downward</label>
+                    <label for="metrics" class="material-symbols-outlined">monitoring</label>
+                    <div class="underline"></div>
+                </div>
+
+                <div class="content">
+                    <div class="content-inner">
+                        <div>
+                            <h2>Get by ID</h2>
+                            <input type="text" class="visible" id="order-id-input" placeholder="Enter order ID"/>
+                            <button id="submit-order-id">Enter</button>
+                        </div>
+                        <div>
+                            <h2>Spam Orders</h2>
+                            <input type="number" class="visible" id="spam-id-input" placeholder="Enter orders count"/>
+                            <button id="submit-spam-count">Enter</button>
+                        </div>
+
+                        <div>
+                            <a href="http://localhost:3000" target="_blank" class="grafana-link">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/3/3b/Grafana_icon.svg" alt="Grafana Icon" class="grafana-icon">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="open-button" id="open-button" style="display: none;">
+            <label class="material-symbols-outlined">chevron_right</label>
+        </div>
+    </div>
+</div>
+
+<script src="script.js" defer></script>
 </body>
 </html>
