@@ -6,7 +6,5 @@ coverage:
 	go tool cover -html coverage.out
 app-run-docker:
 	docker-compose up
-mock:
-	go generate ./...
 lint:
 	golangci-lint run
